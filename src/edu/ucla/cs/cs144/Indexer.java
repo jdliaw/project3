@@ -22,6 +22,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
+import java.util.ArrayList;
+
 public class Indexer {
 
     /** Creates a new instance of Indexer */
@@ -68,7 +70,7 @@ public class Indexer {
         writer.addDocument(doc);
     }
 
-    public void rebuildIndexes() {
+    public void rebuildIndexes() throws IOException{
 
         Connection conn = null;
 
@@ -101,13 +103,13 @@ public class Indexer {
 
         getIndexWriter(true);
         // Index all item entries
-        Item[] items = DbManager.getItems(); // this is supposed to be done in JDBC
+        ArrayList<Item> items = DbManager.getItems(); // this is supposed to be done in JDBC
         for (Item item : items) {
             // System.out.println(item.getName());
             indexItem(item);
         }
         // Index all category entries
-        Category[] categories = DbManager.getCategories();
+        ArrayList<Category> categories = DbManager.getCategories();
         for (Category category : categories) {
             // System.out.println(category.getName());
             indexCategory(category);
@@ -123,6 +125,11 @@ public class Indexer {
 
     public static void main(String args[]) {
         Indexer idx = new Indexer();
-        idx.rebuildIndexes();
+        try {
+            idx.rebuildIndexes();
+        }
+        catch(IOException e) {
+            System.err.println("Rebuild Indexes IOException");
+        }
     }
 }
