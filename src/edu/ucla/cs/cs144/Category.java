@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package lucene.demo.business;
+package edu.ucla.cs.cs144;
 
 /**
  *
