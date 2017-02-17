@@ -52,8 +52,46 @@ public class AuctionSearch implements IAuctionSearch {
 	
 	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
 			int numResultsToReturn) {
-		// TODO: Your code here!
-		return new SearchResult[0];
+		
+			// ArrayList<SearchResult> result = new ArrayList<SearchResult>();
+			// instantiate the search engine
+			SearchEngine se = null;
+			TopDocs topDocs = null;
+			try {
+				se = new SearchEngine();
+				topDocs = se.performSearch(query, numResultsToReturn); 
+			} catch (Exception e) {
+				;
+			}
+
+			// obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
+			ScoreDoc[] hits = topDocs.scoreDocs;
+			int resultSize;
+			SearchResult[] result = new SearchResult[hits.length];
+			// retrieve each matching document from the ScoreDoc arry
+			//i = numresults to skip..?
+			for (int i = 0; i < hits.length; i++) {
+					Document doc =  null;		
+					try {
+						doc = se.getDocument(hits[i].doc);
+					}catch(IOException e) {
+						System.err.println("IOException");
+					}
+					String description = doc.get("description");
+					String name = doc.get("name");
+					String id = doc.get("id");
+					// if(description == null || name == null || id == null) {
+					// 	continue;
+					// }
+					result[i] = new SearchResult(id, name);
+					// result.add(new SearchResult(id, name));
+					System.out.println("Id, name: " + id + ", " + name + "\nDescription: " + description);
+					
+			}
+			System.out.println("Hits.length: " + hits.length);
+
+			
+			return result;
 	}
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,

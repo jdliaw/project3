@@ -59,10 +59,13 @@ public class DbManager {
       Statement s = c.createStatement();
 
       // Execute select statement for Items
-      ResultSet items_rs = s.executeQuery("SELECT * FROM Item");
+      ResultSet items_rs = s.executeQuery("SELECT Name, Description, ItemId FROM Item");
       while (items_rs.next()) {
         item_name = items_rs.getString("Name");
         description = items_rs.getString("Description");
+        if(description == null) {
+          System.out.println("Error, description is null");
+        }
         item_id = items_rs.getString("ItemId");
 
         Item item = new Item(item_id, item_name, description);
@@ -71,7 +74,7 @@ public class DbManager {
       }
 
       // Execute select statement for Category
-      ResultSet cat_rs = s.executeQuery("SELECT * FROM Category");
+      ResultSet cat_rs = s.executeQuery("SELECT Category, ItemId FROM Category");
       while (cat_rs.next()) {
         category_name = cat_rs.getString("Category");
         category_itemId = cat_rs.getString("ItemId");

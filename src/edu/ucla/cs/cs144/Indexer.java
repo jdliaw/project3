@@ -35,7 +35,6 @@ public class Indexer {
     public IndexWriter getIndexWriter(boolean create) throws IOException {
         if (indexWriter == null) {
             Directory indexDir = FSDirectory.open(new File("var/lib/lucene/"));
-            System.out.println("Opened");
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_10_2, new StandardAnalyzer());
             indexWriter = new IndexWriter(indexDir, config);
         }
@@ -55,6 +54,9 @@ public class Indexer {
         doc.add(new StringField("id", item.getId(), Field.Store.YES));
         doc.add(new StringField("name", item.getName(), Field.Store.YES));
         doc.add(new TextField("description", item.getDescription(), Field.Store.YES));
+        if(item.getDescription() == null) {
+          System.out.println("Error, description is null!!!!!!!!!!!");
+        }
         String fullSearchableText = item.getName() + " " + item.getDescription();
         doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
         writer.addDocument(doc);
@@ -74,7 +76,6 @@ public class Indexer {
     public void rebuildIndexes() throws IOException{
 
         Connection conn = null;
-        System.out.println("Rebuilding...");
         // create a connection to the database to retrieve Items from MySQL
         try {
             conn = DbManager.getConnection(true);
@@ -106,13 +107,11 @@ public class Indexer {
         // Index all item entries
         ArrayList<Item> items = DbManager.getItems(); // this is supposed to be done in JDBC
         for (Item item : items) {
-            // System.out.println(item.getName());
             indexItem(item);
         }
         // Index all category entries
         ArrayList<Category> categories = DbManager.getCategories();
         for (Category category : categories) {
-            // System.out.println(category.getName());
             indexCategory(category);
         }
 

@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS Location (
+  ItemID INT NOT NULL,
+  g GEOMETRY NOT NULL,
+  SPATIAL INDEX(g)
+)
+ENGINE = MYISAM;
+
+INSERT INTO Location(ItemID, g)
+SELECT ItemID, Point(Latitude, Longitude) FROM Item WHERE Latitude IS NOT NULL AND LONGITUDE IS NOT NULL;
+
+CREATE SPACIAL INDEX sp_index ON Location(g);
