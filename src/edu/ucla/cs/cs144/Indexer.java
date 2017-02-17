@@ -34,7 +34,8 @@ public class Indexer {
 
     public IndexWriter getIndexWriter(boolean create) throws IOException {
         if (indexWriter == null) {
-            Directory indexDir = FSDirectory.open(new File("/var/lib/lucene/"));
+            Directory indexDir = FSDirectory.open(new File("var/lib/lucene/"));
+            System.out.println("Opened");
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_10_2, new StandardAnalyzer());
             indexWriter = new IndexWriter(indexDir, config);
         }
@@ -48,7 +49,7 @@ public class Indexer {
     }
 
     public void indexItem(Item item) throws IOException {
-        System.out.println("Indexing item: " + item);
+        //System.out.println("Indexing item: " + item);
         IndexWriter writer = getIndexWriter(false);
         Document doc = new Document();
         doc.add(new StringField("id", item.getId(), Field.Store.YES));
@@ -60,7 +61,7 @@ public class Indexer {
     }
 
     public void indexCategory(Category category) throws IOException {
-        System.out.println("Indexing category: " + category);
+        //System.out.println("Indexing category: " + category);
         IndexWriter writer = getIndexWriter(false);
         Document doc = new Document();
         doc.add(new StringField("itemId", category.getItemId(), Field.Store.YES));
@@ -73,7 +74,7 @@ public class Indexer {
     public void rebuildIndexes() throws IOException{
 
         Connection conn = null;
-
+        System.out.println("Rebuilding...");
         // create a connection to the database to retrieve Items from MySQL
         try {
             conn = DbManager.getConnection(true);
@@ -121,6 +122,7 @@ public class Indexer {
         } catch (SQLException ex) {
             System.out.println(ex);
         }
+        closeIndexWriter();
     }
 
     public static void main(String args[]) {
