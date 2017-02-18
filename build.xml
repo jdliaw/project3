@@ -20,6 +20,7 @@
 
     <target name="clean">
 		<delete dir="${obj-dir}" />
+        <delete dir="var/lib/lucene" />
     </target>
 
     <target name="compile" depends="init">
