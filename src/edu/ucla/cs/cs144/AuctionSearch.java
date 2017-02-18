@@ -50,29 +50,50 @@ public class AuctionSearch implements IAuctionSearch {
          *
          */
 	
+	//perform a basic search
 	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
 			int numResultsToReturn) {
-		
-			// ArrayList<SearchResult> result = new ArrayList<SearchResult>();
-			// instantiate the search engine
+
+			// Instantiate stuff and perform the search. Store this in "TopDocs" which is the top docs of the number of stuff we queried
 			SearchEngine se = null;
 			TopDocs topDocs = null;
-			int numTotalQueries = numResultsToSkip + numResultsToReturn;
+			int numTotalQueries = numResultsToSkip + numResultsToReturn;							//we need to query this many, and only take the bottom numResultsToReturn
 			try {
 				se = new SearchEngine();
-				topDocs = se.performSearch(query, numTotalQueries); 
+				topDocs = se.performSearch(query, numTotalQueries); 										//search
 			} catch (Exception e) {
 				;
 			}
 
 			// obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
 			ScoreDoc[] hits = topDocs.scoreDocs;
-			int resultSize;
-			SearchResult[] result = new SearchResult[hits.length];
+
+			// At this point, we have performed our search and gotten the top docs that we want. This 
+			// is scored and then stored in a variable called hits.
+
+
+			// Now, we need to determine the size of our result size. This can be done with a little bit of math due to
+			// hits.length, numResultsToSkip, and numResultsToReturn.
+			int maxResultSize;
+
+			//if we're skipping more than the docs we have, we skip them all, so 0
+			if(hits.length - numResultsToSkip < 0) {													
+				maxResultSize = 0;
+			}
+			//return a max of how many hits we got minus the number we skip
+			else if(hits.length - numResultsToSkip < numResultsToReturn) {
+				maxResultSize = hits.length - numResultsToSkip;
+			}
+			//or, we can only return a max of the number of results specified to return
+			else {
+				maxResultSize = numResultsToReturn;
+			}
+			//Now, create our array
+			SearchResult[] result = new SearchResult[maxResultSize];
 			
-			// retrieve each matching document from the ScoreDoc arry
-			//i = numresults to skip..?
-			for (int i = numResultsToSkip; i < hits.length; i++) {
+			// Now, retrive the matching document from our ScoreDoc array. We start at numResultsToSkip and finish at our maxResultSize + numResultsToSkip
+			// for a total of maxResultSize retrievals.
+			for (int i = numResultsToSkip; i < maxResultSize + numResultsToSkip; i++) {
 					Document doc =  null;		
 					try {
 						doc = se.getDocument(hits[i].doc);
@@ -82,24 +103,12 @@ public class AuctionSearch implements IAuctionSearch {
 					String description = doc.get("description");
 					String name = doc.get("name");
 					String id = doc.get("id");
-					// if(description == null || name == null || id == null) {
-					// 	continue;
-					// }
-					result[i] = new SearchResult(id, name);
-					// result.add(new SearchResult(id, name));
-					// System.out.println("Id, name: " + id + ", " + name + "\nDescription: " + description);
+
+					result[i - numResultsToSkip] = new SearchResult(id, name);
 					
 			}
-			System.out.println("Hits.length: " + hits.length);
-
-			
 			return result;
 	}
-	/*
-"superman": 68 matches
-"kitchenware": 1462
-"star trek": 770
-	*/
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {

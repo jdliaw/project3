@@ -91,8 +91,14 @@ public class Indexer {
 
             Statement s = conn.createStatement();
 
-            //moved from DbManager
+            // moved from DbManager
             // Execute select statement for Category
+
+            // What I did here was execute the query, and look for the stuff that we want.
+            // Rather than using IndexWriter to write index once for category, and once for Item, that was combined...
+            // So first, execute query and go through the results.
+            // If an itemID doesn't exist yet, add it with its corresponding category.
+            // If an itemID does exist, just append that category in the HashMap.
             ResultSet cat_rs = s.executeQuery("SELECT * FROM Category");
             while (cat_rs.next()) {
                 category_name = cat_rs.getString("Category");
@@ -110,7 +116,11 @@ public class Indexer {
 
 
             //moved from DbManager
-                        // Execute select statement for Items
+            // Execute select statement for Items
+            // Now we go through the Item query results. 
+            // I just used code to get the name, description, and itemID.
+            // Math the itemID to the category_itemId and if that's there, then throw it all together into the fullSearchableText variable.
+            // Add that fullSearchableText to doc, and then finally write only once (Category appended into the Item)
             ResultSet items_rs = s.executeQuery("SELECT * FROM Item");
             while (items_rs.next()) {
                 item_name = items_rs.getString("Name");
