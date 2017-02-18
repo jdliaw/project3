@@ -16,26 +16,29 @@ public class AuctionSearchTest {
 		String reply = as.echo(message);
 		System.out.println("Reply: " + reply);
 		
-		// String query = "superman";
-		// SearchResult[] basicResults = as.basicSearch(query, 0, 50000);
-		// System.out.println("Basic Seacrh Query: " + query);
-		// System.out.println("Received " + basicResults.length + " results\n");
-
-		String query = "star trek";
-		SearchResult[] basicResults = null;
-		basicResults = as.basicSearch(query, 0, 60000);
+		String query = "superman";
+		SearchResult[] basicResults = as.basicSearch(query, 0, 50000);
 		System.out.println("Basic Seacrh Query: " + query);
-		System.out.println("Received " + basicResults.length + " results\n");
+		System.out.println("Received " + basicResults.length + " results\nShould be 68 matches\n");
 
-// "superman": 68 matches
+		query = "kitchenware";
+		basicResults = null;
+		basicResults = as.basicSearch(query, 0, 50000);
+		System.out.println("Basic Seacrh Query: " + query);
+		System.out.println("Received " + basicResults.length + " results\nShould be 1462 matches\n");
+
+
+
+		query = "star trek";
+		basicResults = null;
+		basicResults = as.basicSearch(query, 0, 50000);
+		System.out.println("Basic Seacrh Query: " + query);
+		System.out.println("Received " + basicResults.length + " results\nShould be 770 matches\n");
+
+
+		// "superman": 68 matches
 // "kitchenware": 1462
 // "star trek": 770
-
-		// query = "star trek";
-		// basicResults = null;
-		// basicResults = as.basicSearch(query, 0, 50000);
-		// System.out.println("Basic Seacrh Query: " + query);
-		// System.out.println("Received " + basicResults.length + " results\n");
 
 		// for(SearchResult result : basicResults) {
 		// 	System.out.println(result.getItemId() + ": " + result.getName());

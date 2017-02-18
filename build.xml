@@ -29,6 +29,12 @@
         </javac>
     </target>    
 
+    <target name="index" depends="compile">
+        <java classname="edu.ucla.cs.cs144.Indexer" failonerror="true" fork="yes">
+            <classpath refid="classpath"/>
+        </java>
+    </target>
+
     <target name="run" depends="compile">
         <java classname="edu.ucla.cs.cs144.AuctionSearchTest" failonerror="true" fork="yes">
             <classpath refid="classpath"/>

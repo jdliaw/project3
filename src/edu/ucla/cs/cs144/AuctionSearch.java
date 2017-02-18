@@ -57,9 +57,10 @@ public class AuctionSearch implements IAuctionSearch {
 			// instantiate the search engine
 			SearchEngine se = null;
 			TopDocs topDocs = null;
+			int numTotalQueries = numResultsToSkip + numResultsToReturn;
 			try {
 				se = new SearchEngine();
-				topDocs = se.performSearch(query, numResultsToReturn); 
+				topDocs = se.performSearch(query, numTotalQueries); 
 			} catch (Exception e) {
 				;
 			}
@@ -68,9 +69,10 @@ public class AuctionSearch implements IAuctionSearch {
 			ScoreDoc[] hits = topDocs.scoreDocs;
 			int resultSize;
 			SearchResult[] result = new SearchResult[hits.length];
+			
 			// retrieve each matching document from the ScoreDoc arry
 			//i = numresults to skip..?
-			for (int i = 0; i < hits.length; i++) {
+			for (int i = numResultsToSkip; i < hits.length; i++) {
 					Document doc =  null;		
 					try {
 						doc = se.getDocument(hits[i].doc);
@@ -85,7 +87,7 @@ public class AuctionSearch implements IAuctionSearch {
 					// }
 					result[i] = new SearchResult(id, name);
 					// result.add(new SearchResult(id, name));
-					System.out.println("Id, name: " + id + ", " + name + "\nDescription: " + description);
+					// System.out.println("Id, name: " + id + ", " + name + "\nDescription: " + description);
 					
 			}
 			System.out.println("Hits.length: " + hits.length);
@@ -93,6 +95,11 @@ public class AuctionSearch implements IAuctionSearch {
 			
 			return result;
 	}
+	/*
+"superman": 68 matches
+"kitchenware": 1462
+"star trek": 770
+	*/
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
