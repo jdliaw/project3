@@ -126,11 +126,12 @@ public class AuctionSearch implements IAuctionSearch {
 
       int item_id;
 
-      String polygon = "'POLYGON((" + region.getRx() + " " + region.getRy() + ", "
-          + region.getRx() + " " + region.getLy() + ", "
-          + region.getLx() + " " + region.getLy() + ", "
-          + region.getLx() + " " + region.getRy() + ", "
-          + region.getRx() + " " + region.getRy() + "))'";
+      String polygon = "'POLYGON((" +
+				region.getLx() + " " + region.getLy() + ", " +
+				region.getLx() + " " + region.getRy() + ", " +
+				region.getRx() + " " + region.getRy() + ", " +
+				region.getRx() + " " + region.getLy() + ", " +
+				region.getLx() + " " + region.getLy() +  "))'";
 
       Statement s = conn.createStatement();
       ResultSet rs = s.executeQuery("SELECT ItemID FROM Location WHERE MBRContains(GeomFromText("
@@ -146,19 +147,10 @@ public class AuctionSearch implements IAuctionSearch {
       rs.close();
       conn.close();
 
-		} catch (SQLException ex){
-      System.out.println("SQLException caught");
-      System.out.println("---");
-      while ( ex != null ){
-          System.out.println("Message   : " + ex.getMessage());
-          System.out.println("SQLState  : " + ex.getSQLState());
-          System.out.println("ErrorCode : " + ex.getErrorCode());
-          System.out.println("---");
-          ex = ex.getNextException();
-      }
+		} catch (SQLException e){
+      System.out.println(e);
     }
 
-    // System.out.println("spatial size: " + spatialResultSet.size());
     SearchResult[] basicSearchResults = basicSearch(query, 0, spatialResultSet.size());
     ArrayList<SearchResult> results = new ArrayList<SearchResult>();
     int i = 0;
@@ -176,74 +168,6 @@ public class AuctionSearch implements IAuctionSearch {
         }
     }
 		return results.toArray(new SearchResult[results.size()]);
-
-
-		// TODO: Your code here!
-		// if(numResultsToReturn <= 0 || numResultsToSkip < 0) {
-		// 	System.err.println("Invalid input!");
-		// 	return new SearchResult[0];
-		// }
-
-		// int firstResult = 0;
-		// int skippedResults = 0;
-		// int addedResults = 0;
-
-		// ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-		// SearchResult[] basic_search = basicSearch(query, 0, numResultsToReturn);
-
-		// Connection conn = null;
-		// try {
-		// 	conn = DbManager.getConnection(true);
-		// 	Statement s = conn.createStatement();
-
-		// 	String polygon = "GeomFromText('Polygon((" +
-		// 	region.getLx() + " " + region.getLy() + ", " +
-		// 	region.getLx() + " " + region.getRy() + ", " +
-		// 	region.getRx() + " " + region.getRy() + ", " +
-		// 	region.getRx() + " " + region.getLy() + ", " +
-		// 	region.getLx() + " " + region.getLy() +  "))')";
-
-		// 	PreparedStatement checkContains = conn.prepareStatement("SELECT MBRContains(" + polygon +
-		// 	 ",Position) AS isContained FROM Location WHERE ItemID = ?");
-
-		// 	while(addedResults < numResultsToReturn && basic_search.length > 0) {
-		// 		for(int i = 0; i < basic_search.length; i++) {
-		// 			String itemId = basic_search[i].getItemId();
-		// 			checkContains.setString(1, itemId);
-		// 			ResultSet contains_rs = checkContains.executeQuery();
-
-		// 			if(contains_rs.next() && contains_rs.getBoolean("isContained")) {
-		// 				if(addedResults >= numResultsToReturn) {
-		// 					break;
-		// 				}
-		// 				else if (skippedResults >= numResultsToSkip) {
-		// 					results.add(basic_search[i]);
-		// 					addedResults++;
-		// 				}
-		// 				else {
-		// 					skippedResults++;
-		// 				}
-		// 			}
-		// 			contains_rs.close();
-		// 		}
-		// 			firstResult += numResultsToReturn;
-		// 			basic_search = basicSearch(query, firstResult, numResultsToReturn);
-		// 	}
-		// 	checkContains.close();
-		// 	conn.close();
-
-
-		// }
-		// catch (SQLException e) {
-		// 	System.out.println(e);
-		// }
-
-		// SearchResult[] searchResults = new SearchResult[addedResults];
-		// for(int i = 0; i < addedResults; i++) {
-		// 	searchResults[i] = results.get(i);
-		// }
-
-		// return searchResults;
 	}
 
 	public String getXMLDataForItemId(String itemId) {

@@ -34,10 +34,6 @@ public class SearchEngine {
     public TopDocs performSearch(String queryString, int n)
     throws IOException, ParseException {
         Query query = parser.parse(queryString);
-        // System.out.println("query: " + query.toString());
-        // System.out.println("n: " + n);
-        // searcher.search(query, n);
-        // System.out.println("searcher: " + n);
         return searcher.search(query, n);
     }
 
