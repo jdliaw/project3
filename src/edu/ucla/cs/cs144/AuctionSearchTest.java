@@ -17,23 +17,23 @@ public class AuctionSearchTest {
 		System.out.println("Reply: " + reply);
 		
 		String query = "superman";
-		SearchResult[] basicResults = as.basicSearch(query, 1, 4000);
+		SearchResult[] basicResults = as.basicSearch(query, 0, 4000);
 		System.out.println("Basic Seacrh Query: " + query);
-		System.out.println("Received " + basicResults.length + " results\nShould be 68 matches\n");
+		System.out.println("Received " + basicResults.length + " results");//\nShould be 68 matches\n");
 
 		query = "kitchenware";
 		basicResults = null;
-		basicResults = as.basicSearch(query, 1400, 70);
+		basicResults = as.basicSearch(query, 0, 1500);
 		System.out.println("Basic Seacrh Query: " + query);
-		System.out.println("Received " + basicResults.length + " results\nShould be 1462 matches\n");
+		System.out.println("Received " + basicResults.length + " results");//\nShould be 1462 matches\n");
 
 
 
 		query = "star trek";
 		basicResults = null;
-		basicResults = as.basicSearch(query, 0, 50000);
+		basicResults = as.basicSearch(query, 0, 3000);
 		System.out.println("Basic Seacrh Query: " + query);
-		System.out.println("Received " + basicResults.length + " results\nShould be 770 matches\n");
+		System.out.println("Received " + basicResults.length + " results\n");//\nShould be 770 matches\n");
 
 
 		// "superman": 68 matches

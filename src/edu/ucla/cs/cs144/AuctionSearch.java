@@ -32,6 +32,7 @@ import org.apache.lucene.util.Version;
 import edu.ucla.cs.cs144.DbManager;
 import edu.ucla.cs.cs144.SearchRegion;
 import edu.ucla.cs.cs144.SearchResult;
+import java.sql.PreparedStatement;
 
 public class AuctionSearch implements IAuctionSearch {
 
@@ -71,7 +72,6 @@ public class AuctionSearch implements IAuctionSearch {
 			// At this point, we have performed our search and gotten the top docs that we want. This 
 			// is scored and then stored in a variable called hits.
 
-
 			// Now, we need to determine the size of our result size. This can be done with a little bit of math due to
 			// hits.length, numResultsToSkip, and numResultsToReturn.
 			int maxResultSize;
@@ -104,7 +104,8 @@ public class AuctionSearch implements IAuctionSearch {
 					String name = doc.get("name");
 					String id = doc.get("id");
 
-					result[i - numResultsToSkip] = new SearchResult(id, name);
+					int adjustedResultPos = i - numResultsToSkip;
+					result[adjustedResultPos] = new SearchResult(id, name);
 					
 			}
 			return result;
@@ -113,7 +114,71 @@ public class AuctionSearch implements IAuctionSearch {
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
 		// TODO: Your code here!
-		return new SearchResult[0];
+		if(numResultsToReturn <= 0 || numResultsToSkip < 0) {
+			System.err.println("Invalid input!");
+			return new SearchResult[0];
+		}
+
+		int firstResult = 0;
+		int skippedResults = 0;
+		int addedResults = 0;
+
+		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+		SearchResult[] basic_search = basicSearch(query, 0, numResultsToReturn);
+
+		Connection conn = null;
+		try {
+			conn = DbManager.getConnection(true);
+			Statement s = conn.createStatement();
+
+			String polygon = "GeomFromText('Polygon((" + 
+			region.getLx() + " " + region.getLy() + ", " + 
+			region.getLx() + " " + region.getRy() + ", " + 
+			region.getRx() + " " + region.getRy() + ", " + 
+			region.getRx() + " " + region.getLy() + ", " + 
+			region.getLx() + " " + region.getLy() +  "))')";
+		
+			PreparedStatement checkContains = conn.prepareStatement("SELECT MBRContains(" + polygon +
+			 ",Position) AS isContained FROM Location WHERE ItemID = ?");
+
+			while(addedResults < numResultsToReturn && basic_search.length > 0) {
+				for(int i = 0; i < basic_search.length; i++) {
+					String itemId = basic_search[i].getItemId();
+					checkContains.setString(1, itemId);
+					ResultSet contains_rs = checkContains.executeQuery();
+
+					if(contains_rs.next() && contains_rs.getBoolean("isContained")) {
+						if(addedResults >= numResultsToReturn) {
+							break;
+						}
+						else if (skippedResults >= numResultsToSkip) {
+							results.add(basic_search[i]);
+							addedResults++;
+						}
+						else {
+							skippedResults++;
+						}
+					}
+					contains_rs.close();
+				}
+					firstResult += numResultsToReturn;
+					basic_search = basicSearch(query, firstResult, numResultsToReturn);
+			}
+			checkContains.close();
+			conn.close();
+		
+		
+		}
+		catch (SQLException e) {
+			System.out.println(e);
+		}
+
+		SearchResult[] searchResults = new SearchResult[addedResults];
+		for(int i = 0; i < addedResults; i++) {
+			searchResults[i] = results.get(i);
+		}
+		
+		return searchResults;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
@@ -124,5 +189,7 @@ public class AuctionSearch implements IAuctionSearch {
 	public String echo(String message) {
 		return message;
 	}
+
+	
 
 }

@@ -1,11 +1,23 @@
-CREATE TABLE IF NOT EXISTS Location (
-  ItemID INT NOT NULL,
-  g GEOMETRY NOT NULL,
-  SPATIAL INDEX(g)
-)
-ENGINE = MYISAM;
+-- CREATE TABLE Location (
+--   ItemID INT,
+--   Position POINT NOT NULL
 
-INSERT INTO Location(ItemID, g)
-SELECT ItemID, Point(Latitude, Longitude) FROM Item WHERE Latitude IS NOT NULL AND LONGITUDE IS NOT NULL;
+-- )
+-- ENGINE = MYISAM;
 
-CREATE SPACIAL INDEX sp_index ON Location(g);
+-- INSERT INTO Location(ItemID, Position)
+-- SELECT ItemID, Point(Latitude, Longitude) FROM Item WHERE Latitude IS NOT NULL AND Longitude IS NOT NULL;
+
+-- CREATE SPATIAL INDEX sp_index ON Location(Position);
+
+
+CREATE TABLE Location (
+  ItemID INTEGER,
+  Position POINT NOT NULL
+
+) ENGINE = MyISAM;
+
+INSERT INTO Location (ItemID, Position)
+SELECT ItemID, Point(Latitude, Longitude) FROM Item WHERE Latitude<>'null' AND Longitude<>'null';
+
+CREATE SPATIAL INDEX sp_index ON Location (Position);

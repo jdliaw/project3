@@ -114,7 +114,6 @@ public class Indexer {
                 }
             }
 
-
             //moved from DbManager
             // Execute select statement for Items
             // Now we go through the Item query results. 
