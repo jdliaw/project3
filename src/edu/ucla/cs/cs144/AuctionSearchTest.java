@@ -51,9 +51,9 @@ public class AuctionSearchTest {
 		SearchResult[] spatialResults = as.spatialSearch("camera", region, 0, 20);
 		System.out.println("Spatial Search");
 		System.out.println("Received " + spatialResults.length + " results");
-		for(SearchResult result : spatialResults) {
-			System.out.println(result.getItemId() + ": " + result.getName());
-		}
+		// for(SearchResult result : spatialResults) {
+		// 	System.out.println(result.getItemId() + ": " + result.getName());
+		// }
 
 		String itemId = "1497595357";
 		String item = as.getXMLDataForItemId(itemId);
