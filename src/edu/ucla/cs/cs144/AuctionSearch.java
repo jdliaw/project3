@@ -299,7 +299,8 @@ public class AuctionSearch implements IAuctionSearch {
       // LOCATION
       Element location = doc.createElement("Location");
       location.appendChild(doc.createTextNode(rs.getString("Location")));
-      if (!rs.getString("Latitude").equalsIgnoreCase("0") && !rs.getString("Longitude").equalsIgnoreCase("0")) {
+
+      if (!(rs.getString("Latitude") == null || "".equals(rs.getString("Latitude"))) && !(rs.getString("Longitude") == null || "".equals(rs.getString("Longitude"))) && !rs.getString("Latitude").equalsIgnoreCase("0") && !rs.getString("Longitude").equalsIgnoreCase("0") ) {
           location.setAttribute("Latitude", rs.getString("Latitude"));
           location.setAttribute("Longitude", rs.getString("Longitude"));
       }
