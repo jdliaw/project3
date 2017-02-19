@@ -119,26 +119,22 @@ public class AuctionSearch implements IAuctionSearch {
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) throws IOException, ParseException {
 
-		HashSet<Integer> spatialResultSet = new HashSet<Integer>();
+		HashSet<Integer> spatial_rs = new HashSet<Integer>();
 
     try {
       Connection conn = DbManager.getConnection(true);
 
-      int item_id;
+			//check the mysql docs here: https://dev.mysql.com/doc/refman/5.7/en/using-spatial-indexes.html to find out more
+			String geom = "GeomFromText('Polygon((" + region.getLx() + " " + region.getLy() + ", " + region.getLx() + " " + region.getRy() + ", " + region.getRx() + " " + region.getRy() + ", " + region.getRx() + " " + region.getLy() + ", " + region.getLx() + " " + region.getLy() +  "))')";
 
-      String polygon = "'POLYGON((" + region.getRx() + " " + region.getRy() + ", "
-          + region.getRx() + " " + region.getLy() + ", "
-          + region.getLx() + " " + region.getLy() + ", "
-          + region.getLx() + " " + region.getRy() + ", "
-          + region.getRx() + " " + region.getRy() + "))'";
-
+			//See the above comment...
       Statement s = conn.createStatement();
-      ResultSet rs = s.executeQuery("SELECT ItemID FROM Location WHERE MBRContains(GeomFromText("
-          + polygon + "),Position);");
+      ResultSet rs = s.executeQuery("SELECT ItemID FROM Location WHERE MBRContains("
+          + geom + ",Position);");
 
+			//loop through results and add our item ids
       while (rs.next()) {
-          item_id = rs.getInt("ItemID");
-          spatialResultSet.add(item_id);
+          spatial_rs.add(rs.getInt("ItemID"));
       }
 
       // close connections
@@ -146,104 +142,29 @@ public class AuctionSearch implements IAuctionSearch {
       rs.close();
       conn.close();
 
-		} catch (SQLException ex){
-      System.out.println("SQLException caught");
-      System.out.println("---");
-      while ( ex != null ){
-          System.out.println("Message   : " + ex.getMessage());
-          System.out.println("SQLState  : " + ex.getSQLState());
-          System.out.println("ErrorCode : " + ex.getErrorCode());
-          System.out.println("---");
-          ex = ex.getNextException();
-      }
+		} 
+		catch (SQLException e){
+      System.out.println(e);
     }
 
     // System.out.println("spatial size: " + spatialResultSet.size());
-    SearchResult[] basicSearchResults = basicSearch(query, 0, spatialResultSet.size());
+    SearchResult[] basic_search = basicSearch(query, 0, spatial_rs.size());
     ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-    int i = 0;
 
-    for (SearchResult r: basicSearchResults) {
-        if (results.size() >= numResultsToReturn)
-            break;
-
-        if(spatialResultSet.contains(Integer.parseInt(r.getItemId()))) {
-            if (i < numResultsToSkip) {
-                i++;
-                continue;
-            }
-            results.add(r);
-        }
+		int skippedResults = 0;
+    for (SearchResult r: basic_search) {
+    	if (numResultsToReturn < 0) {
+					break;
+			}
+			if(spatial_rs.contains(Integer.parseInt(r.getItemId()))) {
+				if (skippedResults < numResultsToSkip) {
+					skippedResults++;
+					continue;
+				}
+				results.add(r);
+			}
     }
 		return results.toArray(new SearchResult[results.size()]);
-
-
-		// TODO: Your code here!
-		// if(numResultsToReturn <= 0 || numResultsToSkip < 0) {
-		// 	System.err.println("Invalid input!");
-		// 	return new SearchResult[0];
-		// }
-
-		// int firstResult = 0;
-		// int skippedResults = 0;
-		// int addedResults = 0;
-
-		// ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-		// SearchResult[] basic_search = basicSearch(query, 0, numResultsToReturn);
-
-		// Connection conn = null;
-		// try {
-		// 	conn = DbManager.getConnection(true);
-		// 	Statement s = conn.createStatement();
-
-		// 	String polygon = "GeomFromText('Polygon((" +
-		// 	region.getLx() + " " + region.getLy() + ", " +
-		// 	region.getLx() + " " + region.getRy() + ", " +
-		// 	region.getRx() + " " + region.getRy() + ", " +
-		// 	region.getRx() + " " + region.getLy() + ", " +
-		// 	region.getLx() + " " + region.getLy() +  "))')";
-
-		// 	PreparedStatement checkContains = conn.prepareStatement("SELECT MBRContains(" + polygon +
-		// 	 ",Position) AS isContained FROM Location WHERE ItemID = ?");
-
-		// 	while(addedResults < numResultsToReturn && basic_search.length > 0) {
-		// 		for(int i = 0; i < basic_search.length; i++) {
-		// 			String itemId = basic_search[i].getItemId();
-		// 			checkContains.setString(1, itemId);
-		// 			ResultSet contains_rs = checkContains.executeQuery();
-
-		// 			if(contains_rs.next() && contains_rs.getBoolean("isContained")) {
-		// 				if(addedResults >= numResultsToReturn) {
-		// 					break;
-		// 				}
-		// 				else if (skippedResults >= numResultsToSkip) {
-		// 					results.add(basic_search[i]);
-		// 					addedResults++;
-		// 				}
-		// 				else {
-		// 					skippedResults++;
-		// 				}
-		// 			}
-		// 			contains_rs.close();
-		// 		}
-		// 			firstResult += numResultsToReturn;
-		// 			basic_search = basicSearch(query, firstResult, numResultsToReturn);
-		// 	}
-		// 	checkContains.close();
-		// 	conn.close();
-
-
-		// }
-		// catch (SQLException e) {
-		// 	System.out.println(e);
-		// }
-
-		// SearchResult[] searchResults = new SearchResult[addedResults];
-		// for(int i = 0; i < addedResults; i++) {
-		// 	searchResults[i] = results.get(i);
-		// }
-
-		// return searchResults;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
