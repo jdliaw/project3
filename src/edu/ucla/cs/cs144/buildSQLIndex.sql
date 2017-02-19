@@ -12,12 +12,12 @@
 
 
 CREATE TABLE Location (
-  ItemID INTEGER,
+  ItemID INT,
   Position POINT NOT NULL
 
 ) ENGINE = MyISAM;
 
 INSERT INTO Location (ItemID, Position)
-SELECT ItemID, Point(Latitude, Longitude) FROM Item WHERE Latitude<>'null' AND Longitude<>'null';
+SELECT ItemID, POINT(Latitude, Longitude) FROM Item WHERE Latitude<>'null' AND Longitude<>'null';
 
 CREATE SPATIAL INDEX sp_index ON Location (Position);

@@ -15,16 +15,16 @@ public class AuctionSearchTest {
 		String message = "Test message";
 		String reply = as.echo(message);
 		System.out.println("Reply: " + reply);
-		
+
 		String query = "superman";
 		SearchResult[] basicResults = as.basicSearch(query, 0, 4000);
-		System.out.println("Basic Seacrh Query: " + query);
+		System.out.println("Basic Search Query: " + query);
 		System.out.println("Received " + basicResults.length + " results");//\nShould be 68 matches\n");
 
 		query = "kitchenware";
 		basicResults = null;
 		basicResults = as.basicSearch(query, 0, 1500);
-		System.out.println("Basic Seacrh Query: " + query);
+		System.out.println("Basic Search Query: " + query);
 		System.out.println("Received " + basicResults.length + " results");//\nShould be 1462 matches\n");
 
 
@@ -32,7 +32,7 @@ public class AuctionSearchTest {
 		query = "star trek";
 		basicResults = null;
 		basicResults = as.basicSearch(query, 0, 3000);
-		System.out.println("Basic Seacrh Query: " + query);
+		System.out.println("Basic Search Query: " + query);
 		System.out.println("Received " + basicResults.length + " results\n");//\nShould be 770 matches\n");
 
 
@@ -43,16 +43,16 @@ public class AuctionSearchTest {
 		// for(SearchResult result : basicResults) {
 		// 	System.out.println(result.getItemId() + ": " + result.getName());
 		// }
-		
+
 		SearchRegion region =
-		    new SearchRegion(33.774, -118.63, 34.201, -117.38); 
+		    new SearchRegion(33.774, -118.63, 34.201, -117.38);
 		SearchResult[] spatialResults = as.spatialSearch("camera", region, 0, 20);
-		System.out.println("Spatial Seacrh");
+		System.out.println("Spatial Search");
 		System.out.println("Received " + spatialResults.length + " results");
 		for(SearchResult result : spatialResults) {
 			System.out.println(result.getItemId() + ": " + result.getName());
 		}
-		
+
 		String itemId = "1497595357";
 		String item = as.getXMLDataForItemId(itemId);
 		System.out.println("XML data for ItemId: " + itemId);
